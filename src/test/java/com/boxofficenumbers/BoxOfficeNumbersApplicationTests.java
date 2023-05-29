@@ -1,4 +1,4 @@
-package com.boxofficenumbers.boxofficenumbers;
+package com.boxofficenumbers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
