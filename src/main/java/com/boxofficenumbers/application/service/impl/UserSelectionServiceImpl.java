@@ -2,7 +2,7 @@ package com.boxofficenumbers.application.service.impl;
 
 import com.boxofficenumbers.api.dto.MovieSelectionDto;
 import com.boxofficenumbers.api.dto.UserMovieSelectionDto;
-import com.boxofficenumbers.api.impl.UserSelectionSheetRepository;
+import com.boxofficenumbers.application.service.UserSelectionSheetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

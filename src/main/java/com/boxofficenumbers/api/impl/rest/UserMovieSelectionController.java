@@ -1,6 +1,7 @@
 package com.boxofficenumbers.api.impl.rest;
 
 import com.boxofficenumbers.api.dto.UserMovieSelectionDto;
+import com.boxofficenumbers.api.impl.UserMovieSelectionApi;
 import com.boxofficenumbers.application.service.impl.UserSelectionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class UserMovieSelectionController {
+public class UserMovieSelectionController implements UserMovieSelectionApi {
 
     private final UserSelectionServiceImpl userSelectionServiceImpl;
 

@@ -1,4 +1,4 @@
-package com.boxofficenumbers.api.impl;
+package com.boxofficenumbers.application.service;
 
 
 import com.boxofficenumbers.api.dto.UserMovieSelectionDto;
