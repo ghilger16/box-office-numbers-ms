@@ -1,66 +1,42 @@
 package com.boxofficenumbers.api.impl.rest;
 
 import com.boxofficenumbers.api.dto.MovieDto;
+import com.boxofficenumbers.api.dto.ResponseDto;
+import com.boxofficenumbers.application.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/movies")
 public class MovieController {
 
     @Autowired
-    private MovieRepository movieRepository;
+    private MovieService movieService;
+
     @GetMapping
-    public ResponseEntity<List<MovieDto>> getAllMovies() {
-        List<MovieDto> movies = movieRepository.findAll();
-        return new ResponseEntity<>(movies, HttpStatus.OK);
+    public List<MovieDto> getAllMovies() {
+        return movieService.getAllMovies();
     }
 
-     @GetMapping("/{movieId}")
-    public ResponseEntity<?> getMovieById(@PathVariable Long movieId) {
-        Optional<MovieDto> movie = movieRepository.findById(movieId);
-        if (movie.isPresent()) {
-            return new ResponseEntity<>(movie.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
-        }
+    @GetMapping("/{movieId}")
+    public MovieDto getMovieById(@PathVariable Long movieId) {
+        return movieService.getMovieById(movieId);
     }
 
     @PostMapping
-    public ResponseEntity<?> createMovie(@RequestBody MovieDto movie) {
-        MovieDto createdMovie = movieRepository.save(movie);
-        return new ResponseEntity<>(createdMovie, HttpStatus.CREATED);
+    public ResponseDto createMovie(@RequestBody MovieDto movieDto) {
+        return movieService.createMovie(movieDto);
     }
 
     @PutMapping("/{movieId}")
-    public ResponseEntity<?> updateMovie(@PathVariable Long movieId, @RequestBody MovieDto updatedMovie) {
-        Optional<MovieDto> existingMovieOptional = movieRepository.findById(movieId);
-        if (existingMovieOptional.isPresent()) {
-            MovieDto existingMovie = existingMovieOptional.get();
-            existingMovie.setTitle(updatedMovie.getTitle());
-            existingMovie.setBoxOfficeGross(updatedMovie.getBoxOfficeGross());
-            // Update other fields as needed
-
-            MovieDto updated = movieRepository.save(existingMovie);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
-        }
+    public ResponseDto updateMovie(@PathVariable Long movieId, @RequestBody MovieDto updatedMovieDto) {
+        return movieService.updateMovie(movieId, updatedMovieDto);
     }
 
     @DeleteMapping("/{movieId}")
-    public ResponseEntity<?> deleteMovie(@PathVariable Long movieId) {
-        Optional<MovieDto> movieOptional = movieRepository.findById(movieId);
-        if (movieOptional.isPresent()) {
-            movieRepository.deleteById(movieId);
-            return new ResponseEntity<>("Movie deleted successfully", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Movie not found", HttpStatus.NOT_FOUND);
-        }
+    public ResponseDto deleteMovie(@PathVariable Long movieId) {
+        movieService.deleteMovie(movieId);
     }
 }
