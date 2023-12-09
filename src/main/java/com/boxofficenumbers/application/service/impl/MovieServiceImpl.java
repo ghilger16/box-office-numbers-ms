@@ -3,6 +3,7 @@ package com.boxofficenumbers.application.service.impl;
 import com.boxofficenumbers.api.dto.MovieDto;
 import com.boxofficenumbers.api.dto.ResponseDto;
 import com.boxofficenumbers.application.service.MovieService;
+import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,46 +12,43 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class MovieServiceImpl implements MovieService {
+public abstract class MovieServiceImpl implements MovieService {
 
-    @Autowired
     private MovieService movieService;
+    private MapperFacade mapperFacade;
 
     @Autowired
-    private ModelMapper modelMapper; // Assuming you use ModelMapper for entity-DTO conversion
-
-    @Override
-    public List<MovieDto> getAllMovies() {
-        List<MovieDto> movieDtos = movieService.getAllMovies().stream()
-                .map(movie -> modelMapper.map(movie, MovieDto.class))
-                .collect(Collectors.toList());
-        return movieDtos;
+    public MovieServiceImpl(MovieService movieService, MapperFacade mapperFacade) {
+        this.movieService = movieService;
+        this.mapperFacade = mapperFacade;
     }
 
     @Override
     public MovieDto getMovieById(Long movieId) {
-        Optional<MovieDto> movieDtoOptional = movieService.findById(movieId)
-                .map(movie -> modelMapper.map(movie, MovieDto.class));
-        return movieDtoOptional.orElse(null);
+        MovieDto movieDto = movieService.getMovieById(movieId);
+        return movieDto;
+    }
+    @Override
+    public MovieDto getMovieById(Long movieId) {
+        return movieService.getMovieById(movieId)
+                .map(movieDto -> mapperFacade.map(movieDto, MovieDto.class))
+                .orElse(null);
     }
 
     @Override
     public ResponseDto createMovie(MovieDto movieDto) {
-        // Assuming modelMapper can also map from MovieDto to Movie
-        Movie movie = modelMapper.map(movieDto, Movie.class);
-        Movie savedMovie = movieService.save(movie);
-        return modelMapper.map(savedMovie, MovieDto.class);
+        // You might perform additional logic or validation here if needed
+        return mapperFacade.map(movieService.createMovie(movieDto), ResponseDto.class);
     }
 
     @Override
     public ResponseDto updateMovie(Long movieId, MovieDto updatedMovieDto) {
-        Optional<Movie> existingMovieOptional = movieService.findById(movieId);
+        Optional<MovieDto> existingMovieOptional = movieService.getMovieById(movieId);
 
         if (existingMovieOptional.isPresent()) {
-            Movie existingMovie = existingMovieOptional.get();
-            modelMapper.map(updatedMovieDto, existingMovie);
-            Movie updatedMovie = movieService.save(existingMovie);
-            return modelMapper.map(updatedMovie, MovieDto.class);
+            MovieDto existingMovie = existingMovieOptional.get();
+            mapperFacade.map(updatedMovieDto, existingMovie);
+            return mapperFacade.map(movieService.updateMovie(existingMovie), ResponseDto.class);
         } else {
             return null; // or throw an exception, depending on your requirements
         }
@@ -58,6 +56,7 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public ResponseDto deleteMovie(Long movieId) {
-        movieService.deleteById(movieId);
+        movieService.deleteMovie(movieId);
+        return new ResponseDto("Movie deleted successfully", true);
     }
 }
