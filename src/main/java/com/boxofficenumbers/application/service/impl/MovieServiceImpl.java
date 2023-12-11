@@ -1,62 +1,86 @@
 package com.boxofficenumbers.application.service.impl;
 
+import com.boxofficenumbers.adapter.MovieRepository;
 import com.boxofficenumbers.api.dto.MovieDto;
 import com.boxofficenumbers.api.dto.ResponseDto;
-import com.boxofficenumbers.application.service.MovieService;
-import ma.glasnost.orika.MapperFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
-public abstract class MovieServiceImpl implements MovieService {
+public class MovieServiceImpl {
 
-    private MovieService movieService;
-    private MapperFacade mapperFacade;
+    private final MovieRepository movieRepository;
 
     @Autowired
-    public MovieServiceImpl(MovieService movieService, MapperFacade mapperFacade) {
-        this.movieService = movieService;
-        this.mapperFacade = mapperFacade;
+    public MovieServiceImpl(MovieRepository movieRepository) {
+        this.movieRepository = movieRepository;
     }
 
-    @Override
-    public MovieDto getMovieById(Long movieId) {
-        MovieDto movieDto = movieService.getMovieById(movieId);
-        return movieDto;
-    }
-    @Override
-    public MovieDto getMovieById(Long movieId) {
-        return movieService.getMovieById(movieId)
-                .map(movieDto -> mapperFacade.map(movieDto, MovieDto.class))
-                .orElse(null);
+    public List<MovieDto> getAllMovies() {
+        return movieRepository.getAllMovies();
     }
 
-    @Override
+    public MovieDto getMovieById(Long id) {
+        return movieRepository.getMovieById(id);
+    }
+
     public ResponseDto createMovie(MovieDto movieDto) {
-        // You might perform additional logic or validation here if needed
-        return mapperFacade.map(movieService.createMovie(movieDto), ResponseDto.class);
+        movieRepository.createMovie(movieDto);
+
+        ResponseDto response = new ResponseDto();
+        response.setId(movieDto.getId().intValue());
+        response.setMessage("Movie created successfully");
+        response.setHasError(false);
+
+        return response;
     }
 
-    @Override
     public ResponseDto updateMovie(Long movieId, MovieDto updatedMovieDto) {
-        Optional<MovieDto> existingMovieOptional = movieService.getMovieById(movieId);
+        MovieDto existingMovie = getMovieById(movieId);
 
-        if (existingMovieOptional.isPresent()) {
-            MovieDto existingMovie = existingMovieOptional.get();
-            mapperFacade.map(updatedMovieDto, existingMovie);
-            return mapperFacade.map(movieService.updateMovie(existingMovie), ResponseDto.class);
+        if (existingMovie != null) {
+            existingMovie.setTitle(updatedMovieDto.getTitle());
+            existingMovie.setReleaseDate(updatedMovieDto.getReleaseDate());
+
+            ResponseDto response = new ResponseDto();
+            response.setId(existingMovie.getId().intValue()); // Assuming id is an int in the response
+            response.setMessage("Movie updated successfully");
+            response.setHasError(false);
+
+            return response;
         } else {
-            return null; // or throw an exception, depending on your requirements
+            ResponseDto response = new ResponseDto();
+            response.setId(0); // Assuming 0 as an indication of an error
+            response.setMessage("Movie not found");
+            response.setHasError(true);
+
+            return response;
         }
     }
 
-    @Override
     public ResponseDto deleteMovie(Long movieId) {
-        movieService.deleteMovie(movieId);
-        return new ResponseDto("Movie deleted successfully", true);
+        // Implement logic to delete the movie from the repository
+        // For simplicity, I'm assuming a deleteMovie method in the repository
+        MovieDto existingMovie = getMovieById(movieId);
+
+        if (existingMovie != null) {
+            movieRepository.remove(existingMovie);
+
+            ResponseDto response = new ResponseDto();
+            response.setId(existingMovie.getId().intValue()); // Assuming id is an int in the response
+            response.setMessage("Movie deleted successfully");
+            response.setHasError(false);
+
+            return response;
+        } else {
+            ResponseDto response = new ResponseDto();
+            response.setId(0); // Assuming 0 as an indication of an error
+            response.setMessage("Movie not found");
+            response.setHasError(true);
+
+            return response;
+        }
     }
 }
