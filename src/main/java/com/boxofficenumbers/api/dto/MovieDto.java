@@ -16,7 +16,7 @@ public class MovieDto {
     private LocalDate releaseDate;
     private String genre;
     private String directors;
-    private String cast;
+    private String movieCast;
     private int boxOfficeGross;
     private int productionBudget;
     private int runtime;
@@ -68,12 +68,12 @@ public class MovieDto {
         this.directors = directors;
     }
 
-    public String getCast() {
-        return cast;
+    public String getMovieCast() {
+        return movieCast;
     }
 
-    public void setCast(String cast) {
-        this.cast = cast;
+    public void setMovieCast(String movieCast) {
+        this.movieCast = movieCast;
     }
 
     public int getBoxOfficeGross() {

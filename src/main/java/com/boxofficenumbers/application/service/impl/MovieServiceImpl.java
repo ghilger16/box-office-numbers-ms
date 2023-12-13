@@ -3,13 +3,14 @@ package com.boxofficenumbers.application.service.impl;
 import com.boxofficenumbers.adapter.MovieRepository;
 import com.boxofficenumbers.api.dto.MovieDto;
 import com.boxofficenumbers.api.dto.ResponseDto;
+import com.boxofficenumbers.application.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class MovieServiceImpl {
+public class MovieServiceImpl implements MovieService {
 
     private final MovieRepository movieRepository;
 
@@ -19,15 +20,15 @@ public class MovieServiceImpl {
     }
 
     public List<MovieDto> getAllMovies() {
-        return movieRepository.getAllMovies();
+        return movieRepository.findAll();
     }
 
     public MovieDto getMovieById(Long id) {
-        return movieRepository.getMovieById(id);
+        return movieRepository.findById(id).orElse(null);
     }
 
     public ResponseDto createMovie(MovieDto movieDto) {
-        movieRepository.createMovie(movieDto);
+        movieRepository.save(movieDto);
 
         ResponseDto response = new ResponseDto();
         response.setId(movieDto.getId().intValue());
@@ -38,21 +39,23 @@ public class MovieServiceImpl {
     }
 
     public ResponseDto updateMovie(Long movieId, MovieDto updatedMovieDto) {
-        MovieDto existingMovie = getMovieById(movieId);
+        MovieDto existingMovie = movieRepository.findById(movieId).orElse(null);
 
         if (existingMovie != null) {
             existingMovie.setTitle(updatedMovieDto.getTitle());
             existingMovie.setReleaseDate(updatedMovieDto.getReleaseDate());
 
+            movieRepository.save(existingMovie); // Use save to update an existing entity
+
             ResponseDto response = new ResponseDto();
-            response.setId(existingMovie.getId().intValue()); // Assuming id is an int in the response
+            response.setId(existingMovie.getId().intValue());
             response.setMessage("Movie updated successfully");
             response.setHasError(false);
 
             return response;
         } else {
             ResponseDto response = new ResponseDto();
-            response.setId(0); // Assuming 0 as an indication of an error
+            response.setId(0);
             response.setMessage("Movie not found");
             response.setHasError(true);
 
@@ -61,22 +64,18 @@ public class MovieServiceImpl {
     }
 
     public ResponseDto deleteMovie(Long movieId) {
-        // Implement logic to delete the movie from the repository
-        // For simplicity, I'm assuming a deleteMovie method in the repository
-        MovieDto existingMovie = getMovieById(movieId);
-
-        if (existingMovie != null) {
-            movieRepository.remove(existingMovie);
+        if (movieRepository.existsById(movieId)) {
+            movieRepository.deleteById(movieId);
 
             ResponseDto response = new ResponseDto();
-            response.setId(existingMovie.getId().intValue()); // Assuming id is an int in the response
+            response.setId(movieId.intValue());
             response.setMessage("Movie deleted successfully");
             response.setHasError(false);
 
             return response;
         } else {
             ResponseDto response = new ResponseDto();
-            response.setId(0); // Assuming 0 as an indication of an error
+            response.setId(0);
             response.setMessage("Movie not found");
             response.setHasError(true);
 
