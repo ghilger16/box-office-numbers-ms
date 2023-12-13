@@ -26,6 +26,11 @@ public class MovieController {
         return movieService.getMovieById(movieId);
     }
 
+    @GetMapping("/{list}")
+    public List<MovieDto> getMoviesByIds(@RequestParam List<Long> ids) {
+       return movieService.getMoviesByIds(ids);
+    }
+
     @PostMapping
     public ResponseDto createMovie(@RequestBody MovieDto movieDto) {
         return movieService.createMovie(movieDto);

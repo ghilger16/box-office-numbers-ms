@@ -11,6 +11,8 @@ public interface MovieService {
 
     MovieDto getMovieById(Long movieId);
 
+    List<MovieDto> getMoviesByIds(List<Long> ids);
+
     ResponseDto createMovie(MovieDto movieDto);
 
     ResponseDto updateMovie(Long movieId, MovieDto updatedMovieDto);
