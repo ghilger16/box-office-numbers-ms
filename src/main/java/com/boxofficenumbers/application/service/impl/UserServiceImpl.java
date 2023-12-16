@@ -1,7 +1,6 @@
 package com.boxofficenumbers.application.service.impl;
 
 import com.boxofficenumbers.api.dto.UserDto;
-import com.boxofficenumbers.application.service.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;

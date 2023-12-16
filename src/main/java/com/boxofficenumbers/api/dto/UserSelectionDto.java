@@ -1,12 +1,6 @@
 package com.boxofficenumbers.api.dto;
 
-import jakarta.persistence.*;
-
-
 public class UserSelectionDto {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private int boxOfficeGuess;

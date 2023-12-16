@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -28,15 +27,7 @@ public class MovieServiceImpl implements MovieService {
         return movieRepository.findById(id).orElse(null);
     }
 
-    @Override
-    public List<MovieDto> getMoviesByIds(List<Long> ids) {
-        List<MovieDto> movies = movieRepository.findAllById(ids);
-        return movies.stream()
-                .map(this::mapEntityToDto)
-                .collect(Collectors.toList());
-    }
-
-    public ResponseDto createMovie(MovieDto movieDto) {
+     public ResponseDto createMovie(MovieDto movieDto) {
         movieRepository.save(movieDto);
 
         ResponseDto response = new ResponseDto();
