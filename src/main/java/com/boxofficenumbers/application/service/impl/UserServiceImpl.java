@@ -1,57 +1,86 @@
 package com.boxofficenumbers.application.service.impl;
 
+import com.boxofficenumbers.api.dto.ResponseDto;
 import com.boxofficenumbers.api.dto.UserDto;
+import com.boxofficenumbers.adapter.UserRepository;
+import com.boxofficenumbers.application.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
-    public boolean authenticate(String username, String password) {
-        // Find the user by username
-        UserDto user = userRepository.findById(username).orElse(null);
-
-        // Check if the user exists and the password matches
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return true; // Authentication successful
-        }
-
-        return false; // Authentication failed
-    }
-
+    @Override
     public List<UserDto> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<UserDto> getUserById(String userName) {
-        return userRepository.findById(userName);
+    @Override
+    public UserDto getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
     }
 
-    public UserDto createUser(UserDto user) {
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return userRepository.save(user);
+    @Override
+    public ResponseDto createUser(UserDto userDto) {
+        userRepository.save(userDto);
 
+        ResponseDto response = new ResponseDto();
+        response.setId(userDto.getId().intValue());
+        response.setMessage("Movie created successfully");
+        response.setHasError(false);
+
+        return response;
     }
 
-    public UserDto updateUser(UserDto user) {
-        return userRepository.save(user);
+    @Override
+    public ResponseDto updateUser(Long userId, UserDto updatedUserDto) {
+        if (userRepository.existsById(userId)) {
+            updatedUserDto.setId(userId);
+            userRepository.save(updatedUserDto);
+
+            ResponseDto response = new ResponseDto();
+            response.setId(updatedUserDto.getId().intValue());
+            response.setMessage("User updated successfully");
+           response.setHasError(false);
+
+           return response;
+        } else {
+           ResponseDto response = new ResponseDto();
+           response.setId(0);
+           response.setMessage("User update failed");
+           response.setHasError(true);
+
+           return response;
+        }
     }
 
-    public void deleteUser(String userName) {
-        userRepository.deleteById(userName);
+    @Override
+    public ResponseDto deleteUser(Long userId) {
+        if (userRepository.existsById(userId)) {
+            userRepository.deleteById(userId);
+
+            ResponseDto response = new ResponseDto();
+            response.setId(userId.intValue());
+            response.setMessage("User deleted successfully");
+            response.setHasError(false);
+
+            return response;
+        } else {
+            ResponseDto response = new ResponseDto();
+            response.setId(0);
+            response.setMessage("User delete failed");
+            response.setHasError(true);
+
+            return response;
+        }
     }
 }

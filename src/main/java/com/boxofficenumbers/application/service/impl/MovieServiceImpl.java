@@ -45,7 +45,7 @@ public class MovieServiceImpl implements MovieService {
             existingMovie.setTitle(updatedMovieDto.getTitle());
             existingMovie.setReleaseDate(updatedMovieDto.getReleaseDate());
 
-            movieRepository.save(existingMovie); // Use save to update an existing entity
+            movieRepository.save(existingMovie);
 
             ResponseDto response = new ResponseDto();
             response.setId(existingMovie.getId().intValue());
