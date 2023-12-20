@@ -1,10 +1,18 @@
 package com.boxofficenumbers.api.dto;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
 public class UserSelectionDto {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
     private int boxOfficeGuess;
-    private int order;
+    private int selectionOrder;
 
     public Long getId() {
         return id;
@@ -30,11 +38,11 @@ public class UserSelectionDto {
         this.boxOfficeGuess = boxOfficeGuess;
     }
 
-    public int getOrder() {
-        return order;
+    public int getSelectionOrder() {
+        return selectionOrder;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setSelectionOrder(int selectionOrder) {
+        this.selectionOrder = selectionOrder;
     }
 }
